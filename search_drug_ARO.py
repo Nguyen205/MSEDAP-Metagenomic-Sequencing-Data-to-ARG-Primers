@@ -8,9 +8,9 @@ Created on Tue Jan  7 15:53:32 2025
 from owlready2 import *
 import argparse
 
-def get_antibiotics_from_owl(drug_ARO):
+def get_antibiotics_from_owl(drug_ARO,onto):
     
-    onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
+    #onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
 
     target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{drug_ARO}"]
     
@@ -56,7 +56,7 @@ for i in range(0,len(drug_list)):
 
 drug_AROs_out=drug_AROs    #Append more AROs from sub-class antibiotics
 for i in range(0,len(drug_AROs)):
-    drug_AROs_out=drug_AROs_out+get_antibiotics_from_owl(drug_AROs[i])
+    drug_AROs_out=drug_AROs_out+get_antibiotics_from_owl(drug_AROs[i],onto)
 
 print('The AROs of the drugs listed below were not found, please check the spelling or change to other synonyms and try again:')        
 print(drugs_not_found)

@@ -9,9 +9,9 @@ from owlready2 import *
 import pandas as pd
 import argparse
 
-def get_ARGs_from_owl(drug_ARO):
+def get_ARGs_from_owl(drug_ARO,onto):
     
-    onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
+    #onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
 
     target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{drug_ARO}"]
     
@@ -27,9 +27,9 @@ def get_ARGs_from_owl(drug_ARO):
             related_families.append(cls.name.strip('ARO_'))
     return related_classes, related_families
 
-def get_ARGs_from_family(family_ARO):
+def get_ARGs_from_family(family_ARO,onto):
     
-    onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
+    #onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
 
     target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{family_ARO}"]
     
@@ -43,6 +43,7 @@ def get_ARGs_from_family(family_ARO):
 
     return related_classes
 
+onto_content=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
 parser = argparse.ArgumentParser(description='Use the ARO list of antibiotics of interested to search for the sequences of antibiotic resistance genes (ARGs).')
 
 parser.add_argument('-o', '--output', required = False,
@@ -81,12 +82,12 @@ for i in range(0,len(fasta),2):
 ARG_list=[]
 ARG_family_list=[]
 for drug in drug_list:
-    ARG_list_temp,ARG_family_list_temp=get_ARGs_from_owl(drug)
+    ARG_list_temp,ARG_family_list_temp=get_ARGs_from_owl(drug,onto_content)
     ARG_list=ARG_list+ARG_list_temp
     ARG_family_list=ARG_family_list+ARG_family_list_temp
 
 for i in range(0,len(ARG_family_list)):
-    ARG_list=ARG_list+get_ARGs_from_family(ARG_family_list[i])
+    ARG_list=ARG_list+get_ARGs_from_family(ARG_family_list[i],onto_content)
 
 ARG_list=sorted(set(ARG_list))
 
