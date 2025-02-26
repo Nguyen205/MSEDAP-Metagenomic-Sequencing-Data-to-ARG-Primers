@@ -8,6 +8,23 @@ Created on Tue Jan  7 15:53:32 2025
 from owlready2 import *
 import argparse
 
+def get_antibiotics_from_owl(drug_ARO):
+    
+    onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
+
+    target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{drug_ARO}"]
+    
+    # List to hold all the classes that have the given object property pointing to the target class
+    related_classes = []
+    
+    # Loop through all classes in the ontology
+    for cls in onto.classes():
+
+        if target_class in cls.is_a:
+            related_classes.append(cls.name.strip('ARO_'))
+
+    return related_classes
+
 parser = argparse.ArgumentParser(description='Use a list of drug names to search for the drug AROs')
 
 parser.add_argument('-o', '--output', required = False,
@@ -37,20 +54,23 @@ for i in range(0,len(drug_list)):
     else:
         drugs_not_found.append(drug_list[i])
 
-if drugs_not_found!=[]:
-    print('The AROs of the drugs listed below were not found, please check the spelling or change to other synonyms and try again:')        
-    print(drugs_not_found)
-    print('\n')
-    drug_not_found_output=open(args.output.split('drug_AROs')[0]+'drugs_not_found_try_other_synonyms.txt','w')
-    for i in range(0,len(drugs_not_found)):
-        print(drugs_not_found[i],file=drug_not_found_output)
-    drug_not_found_output.close()
+drug_AROs_out=drug_AROs    #Append more AROs from sub-class antibiotics
+for i in range(0,len(drug_AROs)):
+    drug_AROs_out=drug_AROs_out+get_antibiotics_from_owl(drug_AROs[i])
+
+print('The AROs of the drugs listed below were not found, please check the spelling or change to other synonyms and try again:')        
+print(drugs_not_found)
+print('\n')
 print('The AROs of the following drugs were found:')
 print(drugs_found)
-print(drug_AROs)
+print(drug_AROs_out)
 
 ARO_output=open(args.output+'.txt','w')
-for i in range(0,len(drug_AROs)):
-    print(drug_AROs[i],file=ARO_output)
+for i in range(0,len(drug_AROs_out)):
+    print(drug_AROs_out[i],file=ARO_output)
 ARO_output.close()
 
+drug_not_found_output=open(args.output.split('drug_AROs')[0]+'drugs_not_found_try_other_synonyms.txt','w')
+for i in range(0,len(drugs_not_found)):
+    print(drugs_not_found[i],file=drug_not_found_output)
+drug_not_found_output.close()
