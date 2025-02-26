@@ -16,12 +16,29 @@ def get_ARGs_from_owl(drug_ARO):
     target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{drug_ARO}"]
     
     # List to hold all the classes that have the given object property pointing to the target class
-    related_classes = []
-    
+    related_classes=[]
+    related_families=[]
     # Loop through all classes in the ontology
     for cls in onto.classes():
 
         if target_class in cls.confers_resistance_to_antibiotic:
+            related_classes.append(cls.name.strip('ARO_'))
+        if target_class in cls.confers_resistance_to_drug_class:
+            related_families.append(cls.name.strip('ARO_'))
+    return related_classes, related_families
+
+def get_ARGs_from_family(family_ARO):
+    
+    onto=get_ontology("http://purl.obolibrary.org/obo/aro.owl").load()
+
+    target_class=IRIS[f"http://purl.obolibrary.org/obo/ARO_{family_ARO}"]
+    
+    # List to hold all the classes that have the given object property pointing to the target class
+    related_classes=[]
+    # Loop through all classes in the ontology
+    for cls in onto.classes():
+
+        if target_class in cls.is_a:
             related_classes.append(cls.name.strip('ARO_'))
 
     return related_classes
@@ -54,7 +71,7 @@ map_file=pd.read_csv(args.coverage,sep='\t')
 
 mapped_ARGs=[]
 for i in range(0,len(map_file)):
-    if map_file.loc[i,'coverage']>=float(args.percent):
+    if map_file.loc[i,'coverage']>=args.percent:
         mapped_ARGs.append(str(map_file.loc[i,'#rname']))
 
 AROs_for_gRNA=[]
@@ -62,8 +79,14 @@ for i in range(0,len(fasta),2):
     AROs_for_gRNA.append(fasta[i])
 
 ARG_list=[]
+ARG_family_list=[]
 for drug in drug_list:
-    ARG_list=ARG_list+get_ARGs_from_owl(drug)
+    ARG_list_temp,ARG_family_list_temp=get_ARGs_from_owl(drug)
+    ARG_list=ARG_list+ARG_list_temp
+    ARG_family_list=ARG_family_list+ARG_family_list_temp
+
+for i in range(0,len(ARG_family_list)):
+    ARG_list=ARG_list+get_ARGs_from_family(ARG_family_list[i])
 
 ARG_list=sorted(set(ARG_list))
 
