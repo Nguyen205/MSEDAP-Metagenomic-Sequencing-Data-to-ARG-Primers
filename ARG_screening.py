@@ -63,9 +63,10 @@ elif args.mode=='C':
         selected_rows=ARG_info[ARG_info['Cluster#']==ARG_clusters[i]]
         selected_rows.Sequence.str.len().sort_values(inplace=True)
         selected_rows.reset_index(inplace=True,drop=True)
-        output_df=output_df.append(selected_rows.iloc[0])
+        row_df=pd.DataFrame(columns=ARG_info.columns,data=[selected_rows.iloc[0]])
+        output_df=pd.concat([output_df,row_df],ignore_index=True)
     output_df.reset_index(inplace=True,drop=True)
-    output_file=open(args.output,'w')
+    output_file=open(args.output.strip("'"),'w')
     for i in range(0,len(output_df)):
         print('>'+output_df.loc[i,'ARO']+'_'+output_df.loc[i,'ARG Name'],file=output_file)
         print(output_df.loc[i,'Sequence'],file=output_file)
@@ -77,9 +78,10 @@ elif args.mode=='F':
         selected_rows=ARG_info[ARG_info['ARG Family']==ARG_families[i]]
         selected_rows.Sequence.str.len().sort_values(inplace=True)
         selected_rows.reset_index(inplace=True,drop=True)
-        output_df=output_df.append(selected_rows.iloc[0])
+        row_df=pd.DataFrame(columns=ARG_info.columns,data=[selected_rows.iloc[0]])
+        output_df=pd.concat([output_df,row_df],ignore_index=True)
     output_df.reset_index(inplace=True,drop=True)
-    output_file=open(args.output,'w')
+    output_file=open(args.output.strip("'"),'w')
     for i in range(0,len(output_df)):
         print('>'+output_df.loc[i,'ARO']+'_'+output_df.loc[i,'ARG Name'],file=output_file)
         print(output_df.loc[i,'Sequence'],file=output_file)
