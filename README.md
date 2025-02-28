@@ -45,11 +45,11 @@ Before you start, it is recommended to use sequencing quality filtering tools (e
 ```
 cd msedap
 ```
-For single-read fastq input (See `example/Drug_name_example.txt` for the format of the drug list. See `example/single_fastq_list_example.txt` for the format of the single read fastq path list.):
+For single-read fastq input (See `example/Drug_name_example.txt` for the format of the drug list. See `example/single_fastq_list_example.txt` for the format of the single-read fastq path list.):
 ```
 ./msedap.sh -1 single_read_fastq_path_list.txt -d drug_list.txt
 ```
-For paired-read fastq input (See `example/Drug_name_example.txt` for the format of the drug list. See `example/paired_fastq_list_example.txt` for the format of the paired read fastq path list.):
+For paired-read fastq input (See `example/Drug_name_example.txt` for the format of the drug list. See `example/paired_fastq_list_example.txt` for the format of the paired-read fastq path list.):
 ```
 ./msedap.sh -2 paired_read_fastq_path_list.txt -d drug_list.txt
 ```
