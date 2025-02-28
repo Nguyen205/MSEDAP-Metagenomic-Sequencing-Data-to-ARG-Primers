@@ -13,7 +13,6 @@
 #primer_screening.py
 
 # Initialize variables
-flag_q=false
 flag_1=false
 flag_2=false
 flag_d=false
@@ -23,7 +22,6 @@ flag_m=true
 flag_s=true
 flag_f=true
 flag_o=true
-arg_q=""
 arg_1=""
 arg_2=""
 arg_d=""
@@ -41,9 +39,8 @@ usage() {
     echo ""
     echo "Required options:"
     echo ""
-    echo " -q FILE    Query input fastq file. (use this option when sequencing is single-reads)"
-    echo " -1 FILE    Query input fastq file for read 1. (use -1 and -2 when sequencing is paired-reads)"
-    echo " -2 FILE    Query input fastq file for read 2. (use -1 and -2 when sequencing is paired-reads)"
+    echo " -1 FILE    Query input txt file containing all single-read fastq file paths."
+    echo " -2 FILE    Query input txt file containing all paired-read fastq file paths."
     echo " -d FILE    Query input txt file including names of all drugs of interest. (one drug per line)"
     echo ""
     echo "Optional options:"
@@ -61,12 +58,8 @@ usage() {
 }
 
 # Parse command line options
-while getopts "q:1:2:d:t:p:m:s:o:fh" opt; do
+while getopts "1:2:d:t:p:m:s:o:fh" opt; do
     case ${opt} in
-        q )
-            flag_q=true
-            arg_q=$OPTARG
-            ;;
         1 )
             flag_1=true
             arg_1=$OPTARG
@@ -117,22 +110,44 @@ shift $((OPTIND -1))
 echo "Making output directory......"
 mkdir ./output/$arg_o
 
-if $flag_q; then
+if $flag_1; then
     echo "Running Bowtie2 for read mapping......"
-    bowtie2 -x "./ARG_with_NH8B" -U $arg_q -a --very-sensitive --threads $arg_t | samtools view -bSF4 - | samtools sort - -o ./output/$arg_o/map.bam -@ $arg_t 
+    path_list=$arg_1
+    num=`cat $path_list | wc -l`
+    for ((i=1;i<=$num;i++))
+    do
+        path=$(awk -v line="${i}" 'NR==line {print $1}' ${path_list})
+        bowtie2 -x "./ARG_with_NH8B" -U $path -a --very-sensitive --threads $arg_t | samtools view -bSF4 - | samtools sort - -o ./output/$arg_o/map$i.bam -@ $arg_t
+    done
+elif $flag_2; then
+    echo "Running Bowtie2 for read mapping......"
+    path_list=$arg_2
+    num=`cat $path_list | wc -l`
+    for ((i=1;i<=$num;i++))
+    do
+        path1=$(awk -v line="${i}" 'NR==line {print $1}' ${path_list})
+        path2=$(awk -v line="${i}" 'NR==line {print $2}' ${path_list})
+        bowtie2 -x "./ARG_with_NH8B" -1 $path1 -2 $path2 -a --very-sensitive --threads $arg_t | samtools view -bSF4 - | samtools sort - -o ./output/$arg_o/map$i.bam -@ $arg_t
+    done
 elif $flag_1 && $flag_2; then
-    echo "Running Bowtie2 for read mapping......"
-    bowtie2 -x "./ARG_with_NH8B" -1 $arg_1 -2 $arg_2 -a --very-sensitive --threads $arg_t | samtools view -bSF4 - | samtools sort - -o ./output/$arg_o/map.bam -@ $arg_t
+    echo "-1 and -2 are incompatible."
+    usage
 else
     echo "Invalid fastq input."
     usage
 fi
 
+echo "Merging all read mapping files......"
+
+bam_list=$(ls ./output/$arg_o/*.bam | while read bam_file; do echo -n ${bam_file}" "; done)
+#bam_list=$(head -1 bam_list.txt)
+samtools merge ./output/$arg_o/merge.bam $bam_list
+
 echo "Obtaining gene mapping coverages......"
 
-samtools index ./output/$arg_o/map.bam -@ $arg_t 
+samtools index ./output/$arg_o/merge.bam -@ $arg_t 
 
-samtools coverage --ff 0 -o ./output/$arg_o/ARG_coverage.tsv ./output/$arg_o/map.bam
+samtools coverage --ff 0 -o ./output/$arg_o/ARG_coverage.tsv ./output/$arg_o/merge.bam
 
 echo "Searching for the AROs for the drugs provided......"
 
@@ -158,8 +173,8 @@ python3 primer3_outputs_to_xlsx.py -i ./output/$arg_o/primer3_output -o ./output
 
 if [ "$arg_f" = true ]; then
     echo "Running FreeBayes to exclude primer sets that bind to mutation sites......"
-    samtools view --remove-flags 0x100 -b ./output/$arg_o/map.bam >./output/$arg_o/map_cleaned.bam
-    freebayes -f ./ARG_with_NH8B.fasta ./output/$arg_o/map_cleaned.bam >./output/$arg_o/mutations.vcf
+    samtools view --remove-flags 0x100 -b ./output/$arg_o/merge.bam >./output/$arg_o/merge_cleaned.bam
+    freebayes -f ./ARG_with_NH8B.fasta ./output/$arg_o/merge_cleaned.bam >./output/$arg_o/mutations.vcf
     python3 primer_screening.py -f ./output/$arg_o/ARG_seq_screened.fasta -v ./output/$arg_o/mutations.vcf -p ./output/$arg_o/designed_primers.xlsx -o ./output/$arg_o/designed_primers_mutation_screened.xlsx
     echo "Primer design finished with mutation screening step. Results can be found in designed_primers_mutation_screened.xlsx"
 else
