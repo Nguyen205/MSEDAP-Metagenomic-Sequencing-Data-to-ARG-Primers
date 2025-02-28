@@ -140,7 +140,6 @@ fi
 echo "Merging all read mapping files......"
 
 bam_list=$(ls ./output/$arg_o/*.bam | while read bam_file; do echo -n ${bam_file}" "; done)
-#bam_list=$(head -1 bam_list.txt)
 samtools merge ./output/$arg_o/merge.bam $bam_list
 
 echo "Obtaining gene mapping coverages......"
