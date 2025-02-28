@@ -105,7 +105,7 @@ for i in range(0,len(output_df)):
     print_temp.loc[1,'GC Percent']=output_df.loc[i,'P_GC']
     print_temp.loc[2,'GC Percent']=output_df.loc[i,'R_GC']
     print_temp.loc[3,'Amplicon']=output_df.loc[i,'Length']
-    output_print=output_print.append(print_temp,ignore_index=True)
+    output_print=pd.concat([output_print,print_temp],ignore_index=True)
 #Write output
 ################################################################################################################
 output_print.to_excel(args.output,index=None)
