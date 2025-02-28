@@ -1,0 +1,3 @@
+./example/read1.fastq
+./example/read3.fastq
+./example/read5.fastq
