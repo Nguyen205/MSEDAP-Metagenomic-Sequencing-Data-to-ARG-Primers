@@ -16,6 +16,8 @@ parser.add_argument('-i', '--input',required = True,
                     help='Input fasta file path after screening')
 parser.add_argument('-s', '--size',required = False,
                     help='PCR amplicon size range (bp), default: 75-250',default='75-250')
+parser.add_argument('-n', '--number',required = False,
+                    help='Number of primers designed for each ARG, default: 5',default=5)
 
 args = parser.parse_args()
 
@@ -35,6 +37,7 @@ for i in range(0,len(fasta),2):
     print('PRIMER_PICK_LEFT_PRIMER=1',file=output_file)
     print('PRIMER_PICK_INTERNAL_OLIGO=1',file=output_file)
     print('PRIMER_PICK_RIGHT_PRIMER=1',file=output_file)
+    print('PRIMER_NUM_RETURN='+str(args.number),file=output_file)
     print('PRIMER_OPT_SIZE=20',file=output_file)
     print('PRIMER_MIN_SIZE=18',file=output_file)
     print('PRIMER_MAX_SIZE=22',file=output_file)

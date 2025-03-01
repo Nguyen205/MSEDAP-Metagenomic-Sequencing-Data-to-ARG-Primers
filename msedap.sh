@@ -22,6 +22,7 @@ flag_m=true
 flag_s=true
 flag_f=true
 flag_o=true
+flag_n=true
 arg_1=""
 arg_2=""
 arg_d=""
@@ -31,6 +32,7 @@ arg_m="A"
 arg_s="75-250"
 arg_f=false
 arg_o=$(date +%s)
+arg_n=5
 
 # Function to display usage
 usage() {
@@ -49,6 +51,7 @@ usage() {
     echo " -p INT     The coverage percentage cutoff for determining the presence of a gene. (default: 70)"
     echo " -m STR     The mode for ARG screening. A: all ARGs are included. C: select one ARG from each cluster of ARGs that share highly similar sequences. F: select one ARG from each ARG family that share highly similar functions. (default: A)"
     echo " -s STR     The range of the PCR amplicon size. (default: 75-250)"
+    echo " -n INT     Number of primers designed for each ARG. (default: 5)"
     echo " -f         Run FreeBayes to exclude primers that bind to mutated sites of the ARGs in the given sample."
     echo " -o STR     Name the output directory. (default: the current time stamp)" 
     echo ""
@@ -58,7 +61,7 @@ usage() {
 }
 
 # Parse command line options
-while getopts "1:2:d:t:p:m:s:o:fh" opt; do
+while getopts "1:2:d:t:p:m:s:o:n:fh" opt; do
     case ${opt} in
         1 )
             flag_1=true
@@ -89,6 +92,9 @@ while getopts "1:2:d:t:p:m:s:o:fh" opt; do
             ;;
         o )
             arg_o=$OPTARG
+            ;;
+        n )
+            arg_n=$OPTARG
             ;;
         h )
             usage
@@ -162,13 +168,13 @@ python3 ./ARG_screening.py -i ./output/$arg_o/ARG_seq.fasta -m $arg_m -o ./outpu
 
 echo "Designing primers......"
 
-python3 ./ARG_fasta_to_primer3_input.py -i ./output/$arg_o/ARG_seq_screened.fasta -s $arg_s -o ./output/$arg_o/primer3_input
+python3 ./ARG_fasta_to_primer3_input.py -i ./output/$arg_o/ARG_seq_screened.fasta -s $arg_s -o ./output/$arg_o/primer3_input -n $arg_n
 
 mkdir ./output/$arg_o/primer3_output
 
 ls ./output/$arg_o/primer3_input/*.txt | while read i; do ./primer3/src/primer3_core ${i} >./output/$arg_o/primer3_output/${i#*/primer3_input/}; done
 
-python3 primer3_outputs_to_xlsx.py -i ./output/$arg_o/primer3_output -o ./output/$arg_o/designed_primers.xlsx
+python3 primer3_outputs_to_xlsx.py -i ./output/$arg_o/primer3_output -o ./output/$arg_o/designed_primers.xlsx -n $arg_n
 
 if [ "$arg_f" = true ]; then
     echo "Running FreeBayes to exclude primer sets that bind to mutation sites......"
