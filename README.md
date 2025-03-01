@@ -59,6 +59,7 @@ Other optional parameters (Type `./msedap.sh -h` for detailed usage information)
 -p INT     The coverage percentage cutoff for determining the presence of a gene. (default: 70)
 -m STR     The mode for ARG screening. A: all ARGs are included. C: select one ARG from each cluster of ARGs that share highly similar sequences. F: select one ARG from each ARG family that share highly similar functions. (default: A)
 -s STR     The range of the PCR amplicon size. (default: 75-250)
+-n INT     Number of primers designed for each ARG. (default: 5)
 -f         Run FreeBayes to exclude primers that bind to mutated sites of the ARGs in the given sample.
 -o STR     Name the output directory. (default: the current time stamp)
 ```
