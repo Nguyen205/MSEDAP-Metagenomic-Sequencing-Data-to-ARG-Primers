@@ -41,7 +41,7 @@ make test
 ```
 
 ## Database Update
-Before the first use, to access the latest version of the Comprehensive Antibiotic Resistance Database (CARD), run the commands below. It will take around 30 minutes to update all files needed for MSEDAP. For future database updates, delete the "card" and "ARG_fasta_separated" directories generated in previous updates before running the commands.
+Before the first use, to access the latest version of the Comprehensive Antibiotic Resistance Database (CARD), run the commands below. It will take around 30 minutes to update all files needed for MSEDAP. For future database updates, delete the `card` and `ARG_fasta_separated` directories generated in previous updates before running the commands.
 ```
 cd msedap
 ```
