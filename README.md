@@ -40,6 +40,15 @@ make
 make test
 ```
 
+## Database Update
+To access the latest version of the Comprehensive Antibiotic Resistance Database (CARD), run the code below before the first use. It will take around 30 minutes to update all files needed for MSEDAP.
+```
+cd msedap
+```
+```
+./latest_database.sh
+```
+
 ## Usage 
 Before you start, it is recommended to use sequencing quality filtering tools (e.g., [PriceSeqFilter](https://vcru.wisc.edu/simonlab/bioinformatics/programs/price/PriceDocumentation140408/independentQualityFilter.html)) to remove low-quality reads from the fastq files.
 ```
