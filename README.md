@@ -14,6 +14,7 @@ Metagenomic sequencing and qPCR are two mainstream methods for detecting antibio
 * [Samtools](https://www.htslib.org/) (v1.10 or above)  
 * [FreeBayes](https://github.com/freebayes/freebayes)  
 * [Bowtie2](https://github.com/BenLangmead/bowtie2)
+* [FastANI](https://github.com/ParBLiSS/FastANI)
 * [Primer3](https://github.com/primer3-org/primer3) (Primer3 installation is included in the "Installing" part below)
 * [IGV](https://igv.org/)
 
