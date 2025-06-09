@@ -19,12 +19,17 @@ def get_ARGs_from_owl(drug_ARO,onto):
     related_classes=[]
     related_families=[]
     # Loop through all classes in the ontology
+    confers_resistance_to_antibiotic=onto.search_one(iri="*2000000")  
+    confers_resistance_to_drug_class=onto.search_one(iri="*2000001")
+    
     for cls in onto.classes():
-
-        if target_class in cls.confers_resistance_to_antibiotic:
-            related_classes.append(cls.name.strip('ARO_'))
-        if target_class in cls.confers_resistance_to_drug_class:
-            related_families.append(cls.name.strip('ARO_'))
+        try:
+            if target_class in getattr(cls, confers_resistance_to_antibiotic.name, []):
+                related_classes.append(cls.name.strip("ARO_"))
+            if target_class in getattr(cls, confers_resistance_to_drug_class.name, []):
+                related_families.append(cls.name.strip("ARO_"))
+        except AttributeError:
+            continue
     return related_classes, related_families
 
 def get_ARGs_from_family(family_ARO,onto):
@@ -72,7 +77,7 @@ map_file=pd.read_csv(args.coverage,sep='\t')
 
 mapped_ARGs=[]
 for i in range(0,len(map_file)):
-    if map_file.loc[i,'coverage']>=float(args.percent):
+    if map_file.loc[i,'coverage']>=args.percent:
         mapped_ARGs.append(str(map_file.loc[i,'#rname']))
 
 AROs_for_gRNA=[]
