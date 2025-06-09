@@ -77,7 +77,7 @@ map_file=pd.read_csv(args.coverage,sep='\t')
 
 mapped_ARGs=[]
 for i in range(0,len(map_file)):
-    if map_file.loc[i,'coverage']>=args.percent:
+    if map_file.loc[i,'coverage']>=float(args.percent):
         mapped_ARGs.append(str(map_file.loc[i,'#rname']))
 
 AROs_for_gRNA=[]
