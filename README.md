@@ -18,7 +18,7 @@ Metagenomic sequencing and qPCR are two mainstream methods for detecting antibio
 * [Primer3](https://github.com/primer3-org/primer3) (Primer3 installation is included in the "Installing" part below)
 * [IGV](https://igv.org/)
 
-## Installing
+## Installation
 ```
 sudo apt-get install -y build-essential g++ cmake git-all
 ```
